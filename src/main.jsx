@@ -9,7 +9,7 @@ const sizes = {
     height: 600,
 }
 
-const speedDown = 500;
+const speed = 500;
 
 const gameCanvas = document.getElementById('gameCanvas');
 
@@ -24,7 +24,7 @@ class GameScene extends Phaser.Scene {
       super('scene-game');
       this.player;
       this.platform;
-      this.playerSpeed = speedDown;
+      this.playerSpeed = speed;
       this.collectable;
       this.collections = 0;
       this.backgroundMusic;
@@ -59,16 +59,12 @@ class GameScene extends Phaser.Scene {
       this.backgroundMusic = this.sound.add('backgroundMusic');
       this.backgroundMusic.play();
       this.backgroundMusic.loop = true;
-      // this.backgroundMusic.stop();
-
-      this.cursor = this.input.keyboard.createCursorKeys();
+      this.backgroundMusic.stop();
 
       this.add.image(0, 0, 'background').setOrigin(0, 0);
 
-      this.player = this.physics.add.sprite(400, 300, 'player');
-      this.player.setCollideWorldBounds(true);
-      this.player.setScale(3);
-      this.player.setSize(this.player.width/3, this.player.height/1.3);
+      // create cursor keys
+      this.cursor = this.input.keyboard.createCursorKeys();
 
       this.platform = this.physics.add.staticGroup();
       const platformTile = this.platform.create(400, 500, 'platform');
@@ -79,15 +75,36 @@ class GameScene extends Phaser.Scene {
       const map = this.make.tilemap({key: 'tilemap'});
       const tileset = map.addTilesetImage('330-game-map-2', 'tiles');
 
-        // Calculate the y-coordinate for the tilemap layer
+      // Calculate the y-coordinate for the tilemap layer
       const tilemapHeight = map.heightInPixels;
-      const yOffset = sizes.height - tilemapHeight*1.2;
+      const yOffset = sizes.height - tilemapHeight;
 
       const ground = map.createLayer('ground', tileset, 0, yOffset);
 
-      ground.setCollisionByExclusion([-1]);
-      
-      ground.setScale(1.2);
+      // create player animations
+
+      this.createPlayerAnimations();
+
+      // establishing objects layer and spawning player if a spawn point exists
+      const objectsLayer = map.getObjectLayer('objects');
+      objectsLayer.objects.forEach(object => {
+        const { x, y , name , width = 0 } = objectData;
+        
+        switch (name) {
+          case 'player-spawn':
+            {
+              this.player = this.physics.add.sprite(x + (width * 0.5), 300, 'player').play('idle');
+              this.player.setCollideWorldBounds(true);
+              this.player.setScale(2.5);
+              this.player.setSize(this.player.width/3, this.player.height/1.3);
+
+              // camera to follow player
+              this.cameras.main.startFollow(this.player);
+            }
+        }
+      })
+
+      ground.setCollisionByProperty({ collides: true });
 
       this.collectable = this.physics.add.staticGroup();
       const referral = this.collectable.create(platformTile.x, platformTile.y - 50, 'collectable');
@@ -108,49 +125,103 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-      const { left, right, up } = this.cursor;
+      if (!this.player) {
+        return;
+      }
+
+      const { left, right} = this.cursor;
     
-      if (left.isDown) {
-        this.player.setVelocityX(-this.playerSpeed);
-      } else if (right.isDown) {
-        this.player.setVelocityX(this.playerSpeed);
+      if (this.cursor.left.isDown) {
+        this.player.flipX = true;
+        this.player.setVelocityX(-this.playerSpeed*0.4);
+        this.player.play('walk', true);
+      } else if (this.cursor.right.isDown) {
+        this.player.flipX = false;
+        this.player.setVelocityX(this.playerSpeed*0.4);
+        this.player.play('walk', true);
       } else {
         this.player.setVelocityX(0);
+        this.player.play('idle', true);
       }
+
+      const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.cursor.space);
+      const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursor.up); 
     
-      if (up.isDown && this.player.body.blocked.down) {
+      if ((spaceJustPressed || upJustPressed) && this.player.body.blocked.down) {
         this.jumpSFX.play();
         this.player.setVelocityY(-300);
       }
     }
 
-  collectCollectable(player, collectable) {
-    this.collectSFX.play();
-    this.collections += 1;
-    this.textCollections.setText(`Referrals Collected: ${this.collections}`);
+    createPlayerAnimations() {
+      this.anims.create({
+        key: 'idle',
+        frameRate: 3,
+        frames: [
+          { key: 'player', frame: 'tile000.png' },
+          { key: 'player', frame: 'tile001.png' },
+          { key: 'player', frame: 'tile003.png' }
+        ],
+        repeat: -1,
+      })
 
-    collectable.body.enable = false;
+      this.anims.create({
+        key: 'walk',
+        frameRate: 7,
+        frames: this.anims.generateFrameNames('player', { 
+          start: 4, 
+          end: 9, 
+          prefix: 'tile00',
+          suffix: '.png'
+        }),
+        repeat: -1,
+      })
+
+      // this.anims.create({
+      //   key: 'run',
+      //   frames: this.anims.generateFrameNames('player', {
+      //     prefix: 'dino-run-',
+      //     start: 1,
+      //     end: 2,
+      //   }),
+      //   frameRate: 10,
+      //   repeat: -1,
+      // });
     
-    // collectable.destroy();
-
-    collectable.setActive(false);
-    collectable.setVisible(false);
-    
-    console.log(this.collections);
-  }
-
-  gameOver() {
-    this.sys.game.destroy(true);
-    if(this.points >= 10) {
-      endScoreSpan.innerText = this.collections;
-      gameWinLoseSpan.innerText = 'hired!';
-    } else {
-      endScoreSpan.innerText = this.collections;
-      gameWinLoseSpan.innerText = 'rejected.';
+      // this.anims.create({
+      //   key: 'jump',
+      //   frames: [{ key: 'player', frame: 'dino-jump' }],
+      //   frameRate: 10,
+      // })
     }
 
-    gameEndDiv.style.display = 'flex';
-  }
+    collectCollectable(player, collectable) {
+      this.collectSFX.play();
+      this.collections += 1;
+      this.textCollections.setText(`Referrals Collected: ${this.collections}`);
+
+      collectable.body.enable = false;
+      
+      // collectable.destroy();
+
+      collectable.setActive(false);
+      collectable.setVisible(false);
+      
+      console.log(this.collections);
+    }
+
+    gameOver() {
+      this.sys.game.destroy(true);
+      if(this.points >= 10) {
+        endScoreSpan.innerText = this.collections;
+        gameWinLoseSpan.innerText = 'hired!';
+      } else {
+        endScoreSpan.innerText = this.collections;
+        gameWinLoseSpan.innerText = 'rejected.';
+      }
+
+      gameEndDiv.style.display = 'flex';
+    }
 }
 
 const config = {
@@ -161,7 +232,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: speedDown},
+            gravity: { y: speed},
             debug: true,
         },
     },
