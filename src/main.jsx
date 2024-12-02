@@ -13,34 +13,63 @@ const speedDown = 300;
 class GameScene extends Phaser.Scene {
     constructor() {
       super('scene-game');
+      this.player;
+      this.platform;
+      this.playerSpeed = speedDown+50;
+      this.collectable;
+      this.collections = 0;
     }
 
     preload() {
       this.load.image('background', 'assets/background.png');
       this.load.image('player', 'assets/green_player.gif');
-      this.load.image('platform', 'assets/platform.png');
+      this.load.image('platform', 'assets/Tiles/tile_0000.png');
+      this.load.image('collectable', 'assets/Collectables/2.png');
     }
     create() {
       this.add.image(0, 0, 'background').setOrigin(0, 0);
+
       this.player = this.physics.add.sprite(400, 300, 'player');
       this.player.setCollideWorldBounds(true);
-      this.platforms = this.physics.add.staticGroup();
-      this.platforms.create(400, 500, 'platform');
-      this.physics.add.collider(this.player, this.platforms);
+      this.player.setScale(3);
+
+      this.cursor = this.input.keyboard.createCursorKeys();
+
+      this.platform = this.physics.add.staticGroup();
+      const platformTile = this.platform.create(400, 500, 'platform');
+      platformTile.setScale(3);
+      platformTile.refreshBody();
+
+      this.collectable = this.physics.add.staticGroup();
+      const referral = this.collectable.create(platformTile.x, platformTile.y - 50, 'collectable');
+      referral.setScale(0.1);
+      referral.refreshBody();
+      
+      this.physics.add.collider(this.player, this.platform);
+
+      this.physics.add.overlap(this.player, this.collectable, () => this.collectCollectable, null, this);
     }
+
     update() {
-      const player = this.player;
-      const cursors = this.input.keyboard.createCursorKeys();
-      if (cursors.left.isDown) {
-        player.setVelocityX(-160);
-      } else if (cursors.right.isDown) {
-        player.setVelocityX(160);
+      const {left, right, up} = this.cursor;
+
+      if (left.isDown) {
+        this.player.setVelocityX(-this.playerSpeed);
+      } else if (right.isDown) {
+        this.player.setVelocityX(this.playerSpeed);
       } else {
-        player.setVelocityX(0);
+        this.player.setVelocityX(0);
       }
-      if (cursors.up.isDown && player.body.touching.down) {
+
+      if (up.isDown && player.body.touching.down) {
         player.setVelocityY(-500);
       }
+  }
+
+  collectCollectable(player, collectable) {
+    this.collections += 1;
+    collectable.destroy();
+    console.log(this.collections);
   }
 }
 
