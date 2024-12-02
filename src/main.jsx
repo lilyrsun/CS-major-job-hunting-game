@@ -1,4 +1,5 @@
 // Referenced the following video for getting started with Phaser: https://www.youtube.com/watch?v=0qtg-9M3peI
+// Referenced the following video for creating a tilemap: https://www.youtube.com/watch?v=3jOz8k5c5vY
 
 import Phaser from 'phaser';
 import './index.css';
@@ -32,8 +33,16 @@ class GameScene extends Phaser.Scene {
     }
 
     preload() {
+      //tile map
+      this.load.image('tiles', 'assets/Tilemap/tilemap_packed.png');
+      this.load.tilemapTiledJSON('tilemap', 'assets/Tilemap/level1.json');
+
+
       this.load.image('background', 'assets/background.png');
-      this.load.image('player', 'assets/green_player.gif');
+
+      // this.load.image('player', 'assets/green_player.gif');
+      this.load.atlas('player', 'assets/dino.png', 'assets/dino.json');
+
       this.load.image('platform', 'assets/Tiles/tile_0000.png');
       this.load.image('collectable', 'assets/Collectables/2.png');
       this.load.audio('backgroundMusic', 'assets/Sounds/Music/We-Shop-Song-PM-Music.mp3');
@@ -49,8 +58,8 @@ class GameScene extends Phaser.Scene {
 
       this.backgroundMusic = this.sound.add('backgroundMusic');
       this.backgroundMusic.play();
-      // this.backgroundMusic.loop = true;
-      this.backgroundMusic.stop();
+      this.backgroundMusic.loop = true;
+      // this.backgroundMusic.stop();
 
       this.cursor = this.input.keyboard.createCursorKeys();
 
@@ -59,12 +68,26 @@ class GameScene extends Phaser.Scene {
       this.player = this.physics.add.sprite(400, 300, 'player');
       this.player.setCollideWorldBounds(true);
       this.player.setScale(3);
-      this.player.setSize(this.player.width/1.5, this.player.height/1.3);
+      this.player.setSize(this.player.width/3, this.player.height/1.3);
 
       this.platform = this.physics.add.staticGroup();
       const platformTile = this.platform.create(400, 500, 'platform');
       platformTile.setScale(3);
       platformTile.refreshBody();
+
+      //tile map
+      const map = this.make.tilemap({key: 'tilemap'});
+      const tileset = map.addTilesetImage('330-game-map-2', 'tiles');
+
+        // Calculate the y-coordinate for the tilemap layer
+      const tilemapHeight = map.heightInPixels;
+      const yOffset = sizes.height - tilemapHeight*1.2;
+
+      const ground = map.createLayer('ground', tileset, 0, yOffset);
+
+      ground.setCollisionByExclusion([-1]);
+      
+      ground.setScale(1.2);
 
       this.collectable = this.physics.add.staticGroup();
       const referral = this.collectable.create(platformTile.x, platformTile.y - 50, 'collectable');
@@ -79,12 +102,14 @@ class GameScene extends Phaser.Scene {
       
       this.physics.add.collider(this.player, this.platform);
 
+      this.physics.add.collider(this.player, ground);
+
       this.physics.add.overlap(this.player, this.collectable, this.collectCollectable, null, this);
     }
 
     update() {
-      const {left, right, up} = this.cursor;
-
+      const { left, right, up } = this.cursor;
+    
       if (left.isDown) {
         this.player.setVelocityX(-this.playerSpeed);
       } else if (right.isDown) {
@@ -92,12 +117,12 @@ class GameScene extends Phaser.Scene {
       } else {
         this.player.setVelocityX(0);
       }
-
-      if (up.isDown && this.player.body.touching.down) {
+    
+      if (up.isDown && this.player.body.blocked.down) {
         this.jumpSFX.play();
         this.player.setVelocityY(-300);
       }
-  }
+    }
 
   collectCollectable(player, collectable) {
     this.collectSFX.play();
@@ -137,7 +162,7 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: speedDown},
-            debug: true
+            debug: true,
         },
     },
     scene: [GameScene]

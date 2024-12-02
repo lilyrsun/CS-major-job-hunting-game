@@ -1,0 +1,180 @@
+{"frames": [
+
+{
+	"filename": "tile000.png",
+	"frame": {"x":1,"y":147,"w":17,"h":19},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":17,"h":19},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile001.png",
+	"frame": {"x":1,"y":168,"w":17,"h":19},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":17,"h":19},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile002.png",
+	"frame": {"x":1,"y":273,"w":17,"h":18},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":4,"w":17,"h":18},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile003.png",
+	"frame": {"x":1,"y":189,"w":17,"h":19},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":17,"h":19},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile004.png",
+	"frame": {"x":1,"y":293,"w":17,"h":18},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":17,"h":18},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile005.png",
+	"frame": {"x":1,"y":313,"w":17,"h":18},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":4,"w":17,"h":18},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile006.png",
+	"frame": {"x":1,"y":210,"w":17,"h":19},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":17,"h":19},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile007.png",
+	"frame": {"x":1,"y":333,"w":17,"h":18},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":17,"h":18},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile008.png",
+	"frame": {"x":1,"y":353,"w":17,"h":18},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":4,"w":17,"h":18},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile009.png",
+	"frame": {"x":1,"y":231,"w":17,"h":19},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":17,"h":19},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile010.png",
+	"frame": {"x":1,"y":147,"w":17,"h":19},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":17,"h":19},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile011.png",
+	"frame": {"x":1,"y":252,"w":17,"h":19},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":1,"y":3,"w":17,"h":19},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile012.png",
+	"frame": {"x":1,"y":125,"w":17,"h":20},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":2,"w":17,"h":20},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile013.png",
+	"frame": {"x":1,"y":147,"w":17,"h":19},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":17,"h":19},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile017.png",
+	"frame": {"x":1,"y":1,"w":19,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":5,"y":6,"w":19,"h":16},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile018.png",
+	"frame": {"x":1,"y":91,"w":19,"h":15},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":5,"y":5,"w":19,"h":15},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile019.png",
+	"frame": {"x":1,"y":19,"w":19,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":5,"y":6,"w":19,"h":16},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile020.png",
+	"frame": {"x":1,"y":37,"w":19,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":5,"y":5,"w":19,"h":16},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile021.png",
+	"frame": {"x":1,"y":108,"w":19,"h":15},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":5,"y":5,"w":19,"h":15},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile022.png",
+	"frame": {"x":1,"y":55,"w":19,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":5,"y":6,"w":19,"h":16},
+	"sourceSize": {"w":24,"h":24}
+},
+{
+	"filename": "tile023.png",
+	"frame": {"x":1,"y":73,"w":19,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":5,"y":5,"w":19,"h":16},
+	"sourceSize": {"w":24,"h":24}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "dino.png",
+	"format": "RGBA8888",
+	"size": {"w":21,"h":372},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:23887299004b3e733cabad6251b638ef:d98e1120f73beeeb4fee2e6067f7d6d7:604dd05d6aaab271297d13217355623b$"
+}
+}
