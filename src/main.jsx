@@ -61,7 +61,10 @@ class GameScene extends Phaser.Scene {
       this.backgroundMusic.loop = true;
       this.backgroundMusic.stop();
 
-      this.add.image(0, 0, 'background').setOrigin(0, 0);
+      this.add.image(0, 0, 'background')
+        .setOrigin(0, 0)
+        .setScrollFactor(0)
+        .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 
       // create cursor keys
       this.cursor = this.input.keyboard.createCursorKeys();
@@ -71,15 +74,26 @@ class GameScene extends Phaser.Scene {
       platformTile.setScale(3);
       platformTile.refreshBody();
 
-      //tile map
+      // tile map
       const map = this.make.tilemap({key: 'tilemap'});
       const tileset = map.addTilesetImage('330-game-map-2', 'tiles');
 
-      // Calculate the y-coordinate for the tilemap layer
+      // calculate the y-coordinate for the tilemap layer
       const tilemapHeight = map.heightInPixels;
       const yOffset = sizes.height - tilemapHeight;
 
+      // const ground = map.createLayer('ground', tileset, 0, yOffset);
       const ground = map.createLayer('ground', tileset, 0, yOffset);
+      ground.setCollisionByProperty({ collides: true });
+
+      // calc height of ground layer
+      const groundHeight = map.tileHeight * map.height;
+
+      const worldWidth = map.widthInPixels;
+      const worldHeight = map.heightInPixels;
+      
+      this.cameras.main.setBounds(0, 0, worldWidth, sizes.height);
+      this.physics.world.setBounds(0, 0, worldWidth, sizes.height);
 
       // create player animations
 
@@ -87,24 +101,35 @@ class GameScene extends Phaser.Scene {
 
       // establishing objects layer and spawning player if a spawn point exists
       const objectsLayer = map.getObjectLayer('objects');
+
       objectsLayer.objects.forEach(object => {
-        const { x, y , name , width = 0 } = objectData;
-        
-        switch (name) {
-          case 'player-spawn':
-            {
-              this.player = this.physics.add.sprite(x + (width * 0.5), 300, 'player').play('idle');
-              this.player.setCollideWorldBounds(true);
-              this.player.setScale(2.5);
-              this.player.setSize(this.player.width/3, this.player.height/1.3);
+        const { x = 0, y = 0 , name } = object;
 
-              // camera to follow player
-              this.cameras.main.startFollow(this.player);
-            }
+        if (name === 'player-spawn') {
+
+          console.log({
+              x,
+              y,
+              yOffset,
+              tilemapHeight,
+              groundHeight,
+          });
+          console.log('Ground offset:', yOffset);
+          console.log('Camera Bounds:', this.cameras.main.getBounds());
+          console.log('World Bounds:', this.physics.world.bounds);
+
+          this.player = this.physics.add.sprite(x, y + yOffset - 100, 'player').play('idle');
+          // this.player.setCollideWorldBounds(true); --> was messing with player spawn so commented out and manually calculated wall bounds instead
+          this.physics.add.collider(this.player, this.platform);
+          this.physics.add.collider(this.player, ground);
+
+          this.player.setScale(2.5);
+          this.player.setSize(this.player.width / 3, this.player.height / 1.3);
+      
+          // camera follows player after it is initialized
+          this.cameras.main.startFollow(this.player);
         }
-      })
-
-      ground.setCollisionByProperty({ collides: true });
+      });
 
       this.collectable = this.physics.add.staticGroup();
       const referral = this.collectable.create(platformTile.x, platformTile.y - 50, 'collectable');
@@ -116,10 +141,6 @@ class GameScene extends Phaser.Scene {
         fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
         fill: '#fff'
       });
-      
-      this.physics.add.collider(this.player, this.platform);
-
-      this.physics.add.collider(this.player, ground);
 
       this.physics.add.overlap(this.player, this.collectable, this.collectCollectable, null, this);
     }
@@ -142,6 +163,14 @@ class GameScene extends Phaser.Scene {
       } else {
         this.player.setVelocityX(0);
         this.player.play('idle', true);
+      }
+
+      if (this.player.x < 0) {
+        this.player.setX(0);
+        this.player.setVelocityX(0);
+      } else if (this.player.x > this.physics.world.bounds.width) {
+          this.player.setX(this.physics.world.bounds.width);
+          this.player.setVelocityX(0);
       }
 
       const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.cursor.space);
