@@ -107,6 +107,7 @@ class GameScene extends Phaser.Scene {
 
         if (name === 'player-spawn') {
 
+          // debugging, remove later
           console.log({
               x,
               y,

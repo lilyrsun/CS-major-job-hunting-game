@@ -14,6 +14,7 @@
 
 html, body {
   height: 100%;
+  margin: 0;
 }
 
 body {
@@ -35,6 +36,7 @@ header, footer {
 main {
   flex: 1;
   display: flex;
+  position: relative;
 }
 
 #gameCanvas {
@@ -50,6 +52,9 @@ main {
 .gameUI {
   width: 100%;
   height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
   background-color: var(--dkClr);
   display: flex;
   flex-direction: column;
