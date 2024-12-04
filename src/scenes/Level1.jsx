@@ -177,7 +177,7 @@ class Level1 extends Phaser.Scene {
 
     // seeing if player has collected refs and key when colliding w door
     checkDoor(player, door) {
-        if (this.collections === 3 && this.hasKey) {
+        if (this.collections >= 3 && this.hasKey) {
           this.backgroundMusic.stop();
           this.completeSFX.play();
           console.log('Level Passed!');

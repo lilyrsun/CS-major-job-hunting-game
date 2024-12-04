@@ -33,6 +33,7 @@ class Level2 extends Phaser.Scene {
       this.collectSFX;
       this.exit;
       this.graphics;
+      this.enemies;
     }
 
     preload() {
@@ -51,7 +52,9 @@ class Level2 extends Phaser.Scene {
       this.load.image('coffee', 'assets/Collectables/3.png');
       this.load.image('key', 'assets/Collectables/key.png');
       this.load.image('door', 'assets/Collectables/door.png');
-
+      
+      // enemy entity
+      this.load.image('enemy', 'assets/Tiles/Characters/tile_0024.png');
 
       // sounds
       this.load.audio('backgroundMusic2', 'assets/Sounds/Music/Ludwigs-Lullaby-PM-Music.mp3');
@@ -147,6 +150,17 @@ class Level2 extends Phaser.Scene {
           this.physics.add.collider(this.player, ground2);
           this.physics.add.collider(this.player, obstacles);
 
+          // new enemy entity
+          this.enemies = this.physics.add.group();
+          this.physics.add.collider(this.player, this.enemies, this.handlePlayerEnemyCollision, null, this);
+
+          this.time.addEvent({
+              delay: 2000,
+              callback: this.spawnEnemy,
+              callbackScope: this,
+              loop: true
+          });
+
           // this.player.setScale(1.5);
           this.player.setSize(this.player.width / 3, this.player.height / 1.3);
       
@@ -198,7 +212,7 @@ class Level2 extends Phaser.Scene {
 
     // seeing if player has collected refs and key when colliding w door
     checkDoor(player, door) {
-        if (this.collections === 3 && this.hasKey) {
+        if (this.collections >= 3 && this.hasKey) {
             this.backgroundMusic2.stop();
             this.completeSFX.play();
           console.log('Level Passed!');
@@ -212,14 +226,39 @@ class Level2 extends Phaser.Scene {
               fill: '#fff',
             }
           ).setOrigin(0.5);
-
-        this.time.delayedCall(6000, () => {
-          this.scene.start('level-3'); // switch to level 2 when player passes this level
-        });
       } else {
           console.log('You still need to collect all referrals and the key.');
       }
     }
+
+    spawnEnemy() {
+        const randomY = Phaser.Math.Between(50, this.cameras.main.height - 50);
+
+        const enemy = this.enemies.create(this.cameras.main.width, randomY, 'enemy');
+        enemy.setVelocityX(-200);
+
+        enemy.body.setAllowGravity(false);
+        enemy.setCollideWorldBounds(false);
+
+        enemy.setInteractive().on('pointerout', () => {
+            if (enemy.x < 0) {
+                enemy.destroy();
+            }
+        });
+    }
+
+    handlePlayerEnemyCollision(player, enemy) {
+        this.damageSFX.play();
+
+        this.takeDamage(20);
+
+        enemy.destroy();
+
+        if (this.player.health <= 0) {
+            this.handlePlayerDeath();
+        }
+    }
+
 
     update() {
       if (!this.player) {
@@ -264,15 +303,15 @@ class Level2 extends Phaser.Scene {
         this.playerHealthBar.clear();
         const barWidth = 20;
         const barHeight = 3;
-        const barX = this.player.x - barWidth / 2; // Center the health bar above the player
-        const barY = this.player.y - this.player.height / 2 - 5; // Slightly above the player
+        const barX = this.player.x - barWidth / 2; 
+        const barY = this.player.y - this.player.height / 2 - 5;
     
 
         const healthPercent = Phaser.Math.Clamp(this.player.health, 0, 100) / 100;
         this.playerHealthBar.fillStyle(0xa32a2a);
         this.playerHealthBar.fillRect(barX, barY, barWidth, barHeight);
     
-        // Draw the current health
+        // draw health
         this.playerHealthBar.fillStyle(0x64b357);
         this.playerHealthBar.fillRect(barX, barY, barWidth * healthPercent, barHeight);
     }
@@ -293,7 +332,31 @@ class Level2 extends Phaser.Scene {
 
         if (this.player.health <= 0) {
             console.log('Player has died!');
+            this.handlePlayerDeath();
         }
+    }
+
+    handlePlayerDeath() {
+        this.backgroundMusic2.stop();
+        this.player.setVelocity(0, 0);
+        this.player.setActive(false).setVisible(false);
+
+        const message = this.add.text(
+            this.cameras.main.worldView.centerX,
+            this.cameras.main.worldView.centerY,
+            'You Died',
+            {
+                fontSize: '48px',
+                fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
+                fill: '#ff0000',
+            }
+        ).setOrigin(0.5);
+
+        // restart level
+        this.time.delayedCall(2000, () => {
+            message.destroy();
+            this.scene.restart();
+        });
     }
     
     heal(amount) {

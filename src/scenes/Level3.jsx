@@ -21,7 +21,7 @@ const endScoreSpan = document.getElementById('endScoreSpan');
 
 class Level3 extends Phaser.Scene {
     constructor() {
-      super('level-3s');
+      super('level-2');
       this.player;
       this.playerSpeed = speed-150;
       this.collectable;
@@ -60,6 +60,7 @@ class Level3 extends Phaser.Scene {
       this.load.audio('coffee', 'assets/Sounds/SFX/smb_1-up.wav');
       this.load.audio('damage', 'assets/Sounds/SFX/smb_bump.wav');
       this.load.audio('complete', 'assets/Sounds/SFX/smb_stage_clear.wav');
+      
     }
 
     create() {
@@ -198,7 +199,7 @@ class Level3 extends Phaser.Scene {
 
     // seeing if player has collected refs and key when colliding w door
     checkDoor(player, door) {
-        if (this.collections === 3 && this.hasKey) {
+        if (this.collections >= 3 && this.hasKey) {
             this.backgroundMusic2.stop();
             this.completeSFX.play();
           console.log('Level Passed!');
@@ -214,7 +215,7 @@ class Level3 extends Phaser.Scene {
           ).setOrigin(0.5);
 
         this.time.delayedCall(6000, () => {
-          this.scene.start('level-3'); // switch to level 2 when player passes this level
+          this.scene.start('level-3'); // switch to level 3 when player passes this level
         });
       } else {
           console.log('You still need to collect all referrals and the key.');
@@ -264,15 +265,15 @@ class Level3 extends Phaser.Scene {
         this.playerHealthBar.clear();
         const barWidth = 20;
         const barHeight = 3;
-        const barX = this.player.x - barWidth / 2; // Center the health bar above the player
-        const barY = this.player.y - this.player.height / 2 - 5; // Slightly above the player
+        const barX = this.player.x - barWidth / 2; 
+        const barY = this.player.y - this.player.height / 2 - 5;
     
 
         const healthPercent = Phaser.Math.Clamp(this.player.health, 0, 100) / 100;
         this.playerHealthBar.fillStyle(0xa32a2a);
         this.playerHealthBar.fillRect(barX, barY, barWidth, barHeight);
     
-        // Draw the current health
+        // draw health
         this.playerHealthBar.fillStyle(0x64b357);
         this.playerHealthBar.fillRect(barX, barY, barWidth * healthPercent, barHeight);
     }
@@ -293,7 +294,31 @@ class Level3 extends Phaser.Scene {
 
         if (this.player.health <= 0) {
             console.log('Player has died!');
+            this.handlePlayerDeath();
         }
+    }
+
+    handlePlayerDeath() {
+        this.backgroundMusic2.stop();
+        this.player.setVelocity(0, 0);
+        this.player.setActive(false).setVisible(false);
+
+        const message = this.add.text(
+            this.cameras.main.worldView.centerX,
+            this.cameras.main.worldView.centerY,
+            'You Died',
+            {
+                fontSize: '48px',
+                fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
+                fill: '#ff0000',
+            }
+        ).setOrigin(0.5);
+
+        // restart level
+        this.time.delayedCall(2000, () => {
+            message.destroy();
+            this.scene.restart();
+        });
     }
     
     heal(amount) {
